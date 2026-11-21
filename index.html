@@ -322,46 +322,57 @@ function escapar(t) {
 
 // ---------- tela 1: golpe ou verdade ----------
 // cada sinal é uma regra: um nome, uma explicação e um padrão para procurar no texto
+// o filtro lê o texto sem acento e sem diferença entre maiúscula e minúscula (mantém o mesmo tamanho do texto original)
+function plano(t) {
+  return t.replace(/[\u00C0-\u017F]/g, function (c) { return c.normalize('NFD')[0]; });
+}
+
+// cada sinal tem um peso: quanto mais perigoso, mais pontos. Os padrões são escritos sem acento.
 const SINAIS = [
-  { nome: 'Urgência',
+  { nome: 'Urgência', peso: 1,
     dica: 'Golpe tem pressa. Quem quer te enganar não deixa você pensar nem perguntar para ninguém.',
-    padrao: /urgente|imediatamente|agora mesmo|últimas horas|até hoje|hoje mesmo|\bhoje\b|em até \d+ (horas|minutos)/i },
-  { nome: 'Link encurtado ou endereço estranho',
+    padrao: /urgente|imediatamente|agora mesmo|ultimas horas|ate hoje|hoje mesmo|\bhoje\b|rapidinho|\brapido\b|com pressa|\bpressa\b|o quanto antes|expira|\bprazo\b|em ate \d+ ?(horas?|minutos?|h\b)/i },
+  { nome: 'Link encurtado ou endereço estranho', peso: 2,
     dica: 'O endereço não é o do site oficial. Links encurtados escondem para onde você vai.',
-    padrao: /(bit\.ly|tinyurl\.com|t\.co)\/\S+|\b[\w-]+\.(xyz|top|club|online|site|shop|click)\b|https?:\/\/\S+/i },
-  { nome: 'Pede dinheiro ou pagamento',
-    dica: 'Taxa, frete, Pix ou cadastro pagos para receber algo são o jeito mais comum de levar seu dinheiro.',
-    padrao: /\bpix\b|pague|pagamento|\btaxa\b|frete|boleto|depósito|transferência/i },
-  { nome: 'Pede código, senha ou dados',
+    padrao: /(bit\.ly|tinyurl\.com|t\.co|cutt\.ly|is\.gd)\/\S+|\b[\w-]+\.(xyz|top|club|online|site|shop|click|link|vip)\b|https?:\/\/\S+|www\.\S+|clique\s+(aqui|no\s+link|em)|acesse\s+(o\s+)?(link|site|aqui)|link\s+(abaixo|a\s+seguir)/i },
+  { nome: 'Pede dinheiro ou pagamento', peso: 2,
+    dica: 'Taxa, frete, boleto, conta ou Pix para receber ou ajudar alguém são o jeito mais comum de levar seu dinheiro.',
+    padrao: /\b(pix|p1x)\b|\bpagu?e\b|\bpagar\b|\bpagando\b|pagamento|\btaxa\b|frete|boleto|deposit(o|ar|e)\b|transferencia|transferir|emprest\w+|\bdinheiro\b|\bgrana\b|\bcobranca\b|(faz|fazer|manda|mandar|envia|enviar)\s+(um|uma|o|a)?\s*(pix|transferencia|deposito|valor|dinheiro)|(preciso|precisando)\s+(de\s+)?(r\$|dinheiro|um valor|uma ajuda)/i },
+  { nome: 'Pede código, senha ou dados', peso: 3,
     dica: 'Nenhuma empresa séria pede código de SMS, senha ou dados por mensagem.',
-    padrao: /(envie|informe|digite|responda|confirme|passe|mande)[^.!?]*(código|senha|cpf|dados|cartão)/i },
-  { nome: 'Ameaça de perder algo',
+    padrao: /(envie|enviar|informe|informar|digite|responda|confirme|confirmar|passe|passar|mande|mandar|fale|me\s+(manda|envia|passa))[^.!?]*(codigo|senha|cpf|dados|cartao|token|foto do documento)|(codigo|senha|token)[^.!?]*(recebeu|recebido|chegou|por sms|vai receber)/i },
+  { nome: 'Ameaça de perder algo', peso: 1,
     dica: 'Conta bloqueada, número desativado, pacote devolvido: o medo faz você agir sem checar.',
-    padrao: /bloquead\w*|desativad\w*|cancelad\w*|suspens\w*|retid\w*|devolv\w*|multa/i },
-  { nome: 'Promessa de prêmio ou ganho fácil',
+    padrao: /bloquead\w*|desativad\w*|cancelad\w*|suspens\w*|retid\w*|devolv\w*|\bmulta\b|perder\w*\s+(a\s+|o\s+|sua\s+|seu\s+)?(conta|acesso)/i },
+  { nome: 'Promessa de prêmio ou ganho fácil', peso: 2,
     dica: 'Se é bom demais para ser verdade, desconfie. Ninguém dá prêmio para quem não participou de nada.',
-    padrao: /parabéns|sortead\w*|ganhou|prêmio|grátis|ganhe r\$ ?\d+|por dia|renda extra/i },
-  { nome: 'Alguém trocando de identidade',
+    padrao: /parabens|sortead\w*|ganhou|premio|gratis|ganhe\s+r\$ ?\d+|por dia|renda extra|oportunidade unica|\blucro\b|dobrar|ganhos? garantid\w*/i },
+  { nome: 'Alguém trocando de identidade', peso: 2,
     dica: 'Número novo de parente ou suporte de aplicativo que te procura primeiro. Confirme ligando para quem você conhece.',
-    padrao: /mudei de número|novo número|número novo|esse é o novo|suporte do|atendimento do/i },
-  { nome: 'Pede segredo ou pressa na resposta',
+    padrao: /(mudei|trocei|mudou|troquei)\s+(de\s+|o\s+|meu\s+)?(numero|whats\w*|zap|celular|chip|contato)|numero\s+novo|novo\s+numero|(esse|este)\s+(e\s+)?(o\s+)?(meu\s+)?(novo|numero)|salva\s+(esse|este|o|meu|ai)\b|(suporte|atendimento|central)\s+(do|da|de)\b/i },
+  { nome: 'Desculpa para pedir ajuda', peso: 1,
+    dica: 'Golpistas inventam um problema (app travado, celular quebrado) para explicar por que não resolvem sozinhos.',
+    padrao: /\b(app|aplicativo|banco|cartao|celular|whats\w*)\s+(ta|esta|estao|deu|com|ficou|quebrou|travou|bloqueou)[^.!?]{0,20}(problema|erro|bloquead|travad|quebrad)|perdi\s+(meu|o)\s+(celular|cartao|chip)|celular\s+(quebrou|caiu|foi roubado)|nao consigo\s+(pagar|acessar|fazer)/i },
+  { nome: 'Pede segredo ou pressa na resposta', peso: 1,
     dica: 'Quem pede para você não contar ou não perguntar sabe que não passaria numa conferência.',
-    padrao: /não conte|segredo|depois te explico|não fale/i }
+    padrao: /nao conte|segredo|depois te explico|nao fale|nao conta pra|so entre nos|nao avise/i }
 ];
 
 // procura os sinais e devolve só os que apareceram, com o trecho encontrado
 function acharSinais(texto) {
+  const limpo = plano(texto);
   const achados = [];
   SINAIS.forEach(function (s) {
-    const m = texto.match(s.padrao);
-    if (m) achados.push({ nome: s.nome, dica: s.dica, trecho: m[0] });
+    const m = limpo.match(s.padrao);
+    if (m) achados.push({ nome: s.nome, dica: s.dica, peso: s.peso, trecho: m[0] });
   });
   return achados;
 }
 
-// regra do filtro: dois sinais ou mais já deixam a mensagem suspeita
+// soma os pesos: 3 pontos ou mais é golpe, 1 ou 2 pede cuidado, 0 não tem sinal
 function veredito(sinais) {
-  return sinais.length >= 2 ? 'golpe' : 'verdade';
+  const pontos = sinais.reduce(function (t, s) { return t + s.peso; }, 0);
+  return pontos >= 3 ? 'golpe' : (pontos >= 1 ? 'atencao' : 'verdade');
 }
 
 // marca no texto os trechos que o filtro encontrou
@@ -370,7 +381,7 @@ function destacar(texto) {
   SINAIS.forEach(function (s) {
     const re = new RegExp(s.padrao.source, 'gi');
     let m;
-    while ((m = re.exec(texto)) !== null) {
+    while ((m = re.exec(plano(texto))) !== null) {
       if (m[0].length === 0) { re.lastIndex++; continue; }
       faixas.push([m.index, m.index + m[0].length]);
     }
@@ -715,11 +726,9 @@ document.getElementById('t-analisar').addEventListener('click', function () {
     return;
   }
   const sinais = acharSinais(texto);
-  const forte = sinais.some(function (s) { return s.nome === 'Pede código, senha ou dados'; });
-  let classe, titulo;
-  if (sinais.length >= 2 || forte) { classe = 'errado'; titulo = 'Parece golpe.'; }
-  else if (sinais.length === 1) { classe = 'atencao'; titulo = 'Cuidado: tem um sinal de alerta.'; }
-  else { classe = 'certo'; titulo = 'Parece verdade, mas confira.'; }
+  const v = veredito(sinais);
+  const classe = v === 'golpe' ? 'errado' : (v === 'atencao' ? 'atencao' : 'certo');
+  const titulo = v === 'golpe' ? 'Parece golpe.' : (v === 'atencao' ? 'Cuidado: tem sinal de alerta.' : 'Parece verdade, mas confira.');
   let html = '<strong class="titulo">' + titulo + '</strong><p class="balao">' + destacar(texto) + '</p>';
   if (sinais.length) {
     html += 'O filtro achou ' + sinais.length + (sinais.length === 1 ? ' sinal:' : ' sinais:') + '<ul class="sinais">';
