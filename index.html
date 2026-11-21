@@ -8,18 +8,30 @@
 <meta name="theme-color" content="#f2f3f5">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%9B%A1%EF%B8%8F%3C/text%3E%3C/svg%3E">
 <style>
-:root{--bg:#f2f3f5;--card:#fff;--ink:#17181a;--mute:#5f646b;--line:#e1e3e7;--acc:#2f55d4;--ok:#1b7f4b;--okbg:#eaf5ee;--bad:#b83a32;--badbg:#fbeceb;--warn:#b7791f;
+:root{--bg:#f3f7f6;--card:#fff;--ink:#1f2a2e;--mute:#58686d;--line:#dbe5e3;
+--p:#2c7a7b;--p-d:#1f5c5d;--p-l:#dff0ee;
+--s:#6a79c9;--s-d:#4b5aa8;--s-l:#e8ebf8;
+--t:#e3995a;--t-d:#9a5a1f;--t-l:#fcefdf;
+--acc:var(--p);--ok:#3b8c5d;--okbg:#e6f4ec;--bad:#c4524a;--badbg:#fceceb;--warn:#c98a2b;
 --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color-scheme:light}
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 html{background:var(--bg);-webkit-text-size-adjust:100%}
 body{margin:0;font:16px/1.5 var(--sans);color:var(--ink);background:var(--bg);padding-bottom:calc(5.5rem + env(safe-area-inset-bottom,0px))}
 :focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 .miolo{max-width:42rem;margin:0 auto;padding:0 1rem}
-header{padding:calc(1.6rem + env(safe-area-inset-top,0px)) 0 1.2rem}
-h1{margin:0;font-size:1.9rem;line-height:1.1;font-weight:700;letter-spacing:-.025em}
-header p{margin:.4rem 0 0;color:var(--mute);max-width:30rem}
+header{background:var(--p-l);border-radius:0 0 26px 26px;padding:calc(1.4rem + env(safe-area-inset-top,0px)) 0 1.5rem;margin-bottom:1.2rem}
+.marca{display:flex;align-items:center;gap:.9rem}
+.marca svg{width:3rem;height:3rem;flex:none}
+h1{margin:0;font-size:1.9rem;line-height:1.1;font-weight:700;letter-spacing:-.025em;color:var(--p-d)}
+header p{margin:.15rem 0 0;color:#40595b;max-width:30rem}
+.tela{--ac:var(--p)}
+#tela-golpe{--ac:var(--t)}
+#tela-cifra{--ac:var(--s)}
+#tela-aparelho{--ac:var(--t)}
+h2::before{content:"";display:inline-block;width:.7em;height:.7em;border-radius:50%;background:var(--ac);margin-right:.5rem}
 h2{margin:.4rem 0 .35rem;font-size:1.35rem;line-height:1.2;font-weight:650;letter-spacing:-.015em}
-h3{margin:0 0 .6rem;font-size:1rem;font-weight:650}
+h3{margin:0 0 .6rem;font-size:1rem;font-weight:650;color:var(--p-d)}
 .intro{margin:0 0 1rem;color:var(--mute)}
 .nota{margin:.9rem 0 0;font-size:.875rem;color:var(--mute)}
 
@@ -28,14 +40,14 @@ nav{position:fixed;left:0;right:0;bottom:0;z-index:5;background:rgba(255,255,255
 .abas{display:grid;grid-template-columns:repeat(4,1fr);max-width:42rem;margin:0 auto}
 .aba{display:flex;flex-direction:column;align-items:center;gap:.2rem;padding:.6rem .2rem .55rem;border:0;background:none;font:inherit;font-size:.72rem;line-height:1.15;color:var(--mute);cursor:pointer;text-align:center}
 .aba svg{width:1.5rem;height:1.5rem;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
-.aba[aria-selected="true"]{color:var(--acc);font-weight:650}
+.aba[aria-selected="true"]{color:var(--p-d);font-weight:650;box-shadow:inset 0 3px 0 var(--p)}
 @media(min-width:720px){
  body{padding-bottom:3rem}
  nav{position:static;background:none;border:0;backdrop-filter:none;-webkit-backdrop-filter:none;max-width:42rem;margin:0 auto 1.2rem;padding:0 1rem}
- .abas{background:#e5e7ea;border-radius:12px;padding:3px;gap:2px}
+ .abas{background:#dbe9e7;border-radius:12px;padding:3px;gap:2px}
  .aba{flex-direction:row;justify-content:center;gap:.45rem;font-size:.9rem;padding:.55rem .4rem;border-radius:9px}
  .aba svg{width:1.1rem;height:1.1rem}
- .aba[aria-selected="true"]{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+ .aba[aria-selected="true"]{background:#fff;color:var(--p-d);box-shadow:0 1px 2px rgba(31,92,93,.2)}
 }
 .tela[hidden]{display:none}
 
@@ -43,8 +55,8 @@ nav{position:fixed;left:0;right:0;bottom:0;z-index:5;background:rgba(255,255,255
 .painel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.1rem}
 .painel+.painel{margin-top:.9rem}
 button{font:inherit}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:2.9rem;padding:.55rem 1.1rem;border-radius:10px;border:1px solid var(--ink);background:var(--ink);color:#fff;font-weight:600;cursor:pointer}
-.btn.vazio{background:var(--card);color:var(--ink);border-color:#c9ccd2}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:2.9rem;padding:.55rem 1.1rem;border-radius:10px;border:1px solid var(--p);background:var(--p);color:#fff;font-weight:600;cursor:pointer}
+.btn.vazio{background:var(--card);color:var(--p-d);border-color:#9fc9c6}
 .btn:active{transform:scale(.98)}
 .btn:disabled{opacity:.45;cursor:default}
 .btn svg{width:1rem;height:1rem}
@@ -52,14 +64,14 @@ button{font:inherit}
 .linha-botoes .btn{flex:1 1 8rem}
 .grandes{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-top:1rem}
 .grandes[hidden]{display:none}
-.grandes .btn{background:var(--card);color:var(--ink);border-color:#c9ccd2;min-height:3.4rem;font-size:1.05rem}
-.grandes .btn.vermelho{color:var(--bad)}
-#g-verdade{color:var(--ok)}
+.grandes .btn{min-height:3.4rem;font-size:1.05rem}
+.grandes .btn.vermelho{background:var(--badbg);color:#9b2f28;border-color:#eab7b2}
+#g-verdade{background:var(--okbg);color:#27643f;border-color:#b5dac3}
 label.campo{display:block;margin-bottom:.35rem;font-size:.9rem;font-weight:600}
-input[type=text],input[type=number],textarea{width:100%;font:inherit;color:inherit;background:#fff;border:1px solid #c9ccd2;border-radius:10px;padding:.7rem .8rem}
+input[type=text],input[type=number],textarea{width:100%;font:inherit;color:inherit;background:#fff;border:1px solid #bcd3d0;border-radius:10px;padding:.7rem .8rem}
 textarea{min-height:6.5rem;resize:vertical}
 input:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:0;border-color:var(--acc)}
-mark{background:#fde9a2;color:inherit;border-radius:3px;padding:0 .1em}
+mark{background:#fbdcb4;color:inherit;border-radius:3px;padding:0 .1em}
 code{font-family:var(--mono);font-size:.85em}
 
 /* golpe ou verdade */
@@ -67,12 +79,12 @@ code{font-family:var(--mono);font-size:.85em}
 .pilula{color:var(--ink);font-weight:600}
 .progresso{display:flex;gap:4px;margin:.6rem 0 1.1rem}
 .progresso i{flex:1;height:4px;border-radius:2px;background:var(--line)}
-.progresso i.atual{background:var(--ink)}
+.progresso i.atual{background:var(--s)}
 .progresso i.certo{background:var(--ok)}
 .progresso i.errado{background:var(--bad)}
-.de{display:flex;align-items:center;gap:.4rem;margin-bottom:.4rem;font-size:.9rem;font-weight:600;color:var(--mute)}
+.de{display:flex;align-items:center;gap:.4rem;margin-bottom:.4rem;font-size:.9rem;font-weight:600;color:var(--s-d)}
 .de svg{width:1rem;height:1rem;flex:none}
-.balao{margin:0;padding:.8rem 1rem;background:#eceef0;border-radius:4px 16px 16px 16px;overflow-wrap:anywhere}
+.balao{margin:0;padding:.8rem 1rem;background:var(--s-l);border-radius:4px 16px 16px 16px;overflow-wrap:anywhere}
 .resposta{margin-top:1rem;padding:.9rem 1rem;border-radius:10px;border-left:4px solid var(--line);background:#f5f6f7}
 .resposta.certo{background:var(--okbg);border-left-color:var(--ok)}
 .resposta.errado{background:var(--badbg);border-left-color:var(--bad)}
@@ -82,7 +94,7 @@ code{font-family:var(--mono);font-size:.85em}
 .sinais li{margin:.3rem 0}
 
 /* criptografia */
-.saida{min-height:4rem;padding:.8rem;background:#f5f6f7;border:1px solid var(--line);border-radius:10px;font-family:var(--mono);font-size:.95rem;white-space:pre-wrap;overflow-wrap:anywhere}
+.saida{min-height:4rem;padding:.8rem;background:var(--s-l);border:1px solid #d3d9f2;border-radius:10px;font-family:var(--mono);font-size:.95rem;white-space:pre-wrap;overflow-wrap:anywhere}
 .chave{display:flex;gap:.5rem;align-items:center}
 .chave input{width:4.5rem;text-align:center;font-weight:600}
 .chave .btn{min-width:2.9rem;padding:.5rem}
@@ -91,7 +103,7 @@ code{font-family:var(--mono);font-size:.85em}
 .fita .linha+.linha{margin-top:.2rem}
 .fita .rot{font-size:.75rem;color:var(--mute)}
 .fita span.l{text-align:center;font-family:var(--mono);font-size:.8rem;padding:.15rem 0}
-.fita .linha.nova span.l{background:var(--ink);color:#fff;border-radius:4px}
+.fita .linha.nova span.l{background:var(--s);color:#fff;border-radius:4px}
 .todas{list-style:none;margin:1rem 0 0;padding:0;border:1px solid var(--line);border-radius:10px;max-height:18rem;overflow:auto}
 .todas[hidden]{display:none}
 .todas li{padding:.5rem .8rem;border-bottom:1px solid var(--line);font-family:var(--mono);font-size:.85rem;overflow-wrap:anywhere}
@@ -107,32 +119,36 @@ code{font-family:var(--mono);font-size:.85em}
 .rotulo-forca{margin:.45rem 0 .8rem;font-size:.9rem;color:var(--mute)}
 .regras{list-style:none;margin:0 0 1rem;padding:0}
 .regras li{display:grid;grid-template-columns:1.6rem 1fr;gap:.2rem .7rem;padding:.6rem 0;border-top:1px solid var(--line)}
-.regras .sel{display:grid;place-items:center;width:1.5rem;height:1.5rem;border-radius:50%;background:#eceef0;color:var(--mute);font-size:.85rem;font-weight:700}
+.regras .sel{display:grid;place-items:center;width:1.5rem;height:1.5rem;border-radius:50%;background:#e4eceb;color:var(--mute);font-size:.85rem;font-weight:700}
 .regras li.passa .sel{background:var(--ok);color:#fff}
 .regras li.falha .sel{background:var(--bad);color:#fff}
 .regras .traducao,.regras code.linha-codigo{grid-column:2;font-size:.875rem;color:var(--mute)}
 .regras code.linha-codigo{display:none;background:#f5f6f7;padding:.35rem .5rem;border-radius:6px;overflow-wrap:anywhere}
 .mostrar-codigo .regras code.linha-codigo{display:block}
 .interruptor{display:flex;align-items:center;gap:.5rem;font-size:.9rem}
-.interruptor input{width:1.1rem;height:1.1rem;accent-color:var(--ink)}
+.interruptor input{width:1.1rem;height:1.1rem;accent-color:var(--p)}
 
 /* checklist */
 .resumo{margin:0 0 .6rem;font-weight:600}
 .barra{height:8px;border-radius:4px;background:var(--line);overflow:hidden}
-.barra i{display:block;height:100%;width:0;background:var(--ok);transition:width .25s}
+.barra i{display:block;height:100%;width:0;background:var(--p);transition:width .25s}
 .itens{list-style:none;margin:1rem 0 0;padding:0}
 .itens li{border-top:1px solid var(--line)}
 .item{display:grid;grid-template-columns:1.6rem 1fr;gap:.75rem;padding:.8rem 0;cursor:pointer}
-.item input{appearance:none;-webkit-appearance:none;width:1.5rem;height:1.5rem;margin:.1rem 0 0;border:1.5px solid #a9adb4;border-radius:7px;background:#fff;display:grid;place-items:center;cursor:pointer}
-.item input:checked{background:var(--ok);border-color:var(--ok)}
+.item input{appearance:none;-webkit-appearance:none;width:1.5rem;height:1.5rem;margin:.1rem 0 0;border:1.5px solid #9fb9b6;border-radius:7px;background:#fff;display:grid;place-items:center;cursor:pointer}
+.item input:checked{background:var(--p);border-color:var(--p)}
 .item input:checked::after{content:"";width:.35rem;height:.7rem;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg) translate(-1px,-1px)}
 .item .nome{display:block;font-weight:600}
 .item .como{display:block;font-size:.9rem;color:var(--mute)}
-.item .estado{display:inline-block;margin-top:.3rem;font-size:.8rem;font-weight:600;color:var(--bad)}
-.item.feito .estado{color:var(--ok)}
+.item .estado{display:inline-block;margin-top:.3rem;padding:.05rem .55rem;border-radius:99px;font-size:.78rem;font-weight:600;background:var(--t-l);color:var(--t-d)}
+.item.feito .estado{background:var(--p-l);color:var(--p-d)}
 
 .grade2+.painel,.painel+.grade2{margin-top:.9rem}
 .grade2 .painel+.painel{margin-top:.9rem}
+.resposta.atencao{background:var(--t-l);border-left-color:var(--t)}
+.resposta .balao{margin:.5rem 0 .7rem;background:#fff}
+.divisor{margin:1.6rem 0 .9rem}
+.divisor h2::before{background:var(--s)}
 footer{margin-top:2rem;font-size:.85rem;color:var(--mute)}
 footer p{margin:.5rem 0;max-width:36rem}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
@@ -141,8 +157,13 @@ footer p{margin:.5rem 0;max-width:36rem}
 <body>
 <div class="miolo">
 <header>
+<div class="marca">
+<svg viewBox="0 0 48 48" role="img" aria-label="Logotipo: três círculos"><circle cx="17" cy="19" r="12" fill="#2c7a7b" fill-opacity=".9"/><circle cx="31" cy="19" r="12" fill="#6a79c9" fill-opacity=".85"/><circle cx="24" cy="31" r="12" fill="#e3995a" fill-opacity=".85"/></svg>
+<div>
 <h1>Blindagem</h1>
 <p>Quatro atividades para você proteger o seu celular e as suas contas.</p>
+</div>
+</div>
 </header>
 </div>
 
@@ -176,7 +197,21 @@ footer p{margin:.5rem 0;max-width:36rem}
         <button type="button" class="btn vazio" id="g-proxima" hidden>Próxima mensagem</button>
       </div>
     </div>
-  </section>
+  
+<div class="divisor">
+<h2>Teste a sua mensagem</h2>
+<p class="intro">Recebeu algo estranho hoje? Cole ou escreva a mensagem aqui e veja o que o filtro acha. Nada do que você escreve sai do seu aparelho. Não coloque senhas nem códigos de verdade.</p>
+</div>
+<div class="painel">
+<label class="campo" for="t-texto">Mensagem para testar</label>
+<textarea id="t-texto" placeholder="Cole aqui a mensagem que você recebeu"></textarea>
+<div class="linha-botoes">
+<button type="button" class="btn" id="t-analisar">Analisar mensagem</button>
+<button type="button" class="btn vazio" id="t-limpar">Limpar</button>
+</div>
+<div id="t-resposta" class="resposta" hidden aria-live="polite"></div>
+</div>
+</section>
 
   <!-- ============ TELA 2: CRIPTOGRAFIA ============ -->
   <section class="tela" id="tela-cifra" role="tabpanel" aria-labelledby="aba-cifra" hidden>
@@ -668,6 +703,41 @@ document.getElementById('a-limpar').addEventListener('click', function () {
   desenharChecklist();
 });
 desenharChecklist();
+
+// ---------- teste da sua mensagem ----------
+document.getElementById('t-analisar').addEventListener('click', function () {
+  const texto = document.getElementById('t-texto').value.trim();
+  const alvo = document.getElementById('t-resposta');
+  if (!texto) {
+    alvo.className = 'resposta';
+    alvo.innerHTML = 'Escreva ou cole uma mensagem no campo acima.';
+    alvo.hidden = false;
+    return;
+  }
+  const sinais = acharSinais(texto);
+  const forte = sinais.some(function (s) { return s.nome === 'Pede código, senha ou dados'; });
+  let classe, titulo;
+  if (sinais.length >= 2 || forte) { classe = 'errado'; titulo = 'Parece golpe.'; }
+  else if (sinais.length === 1) { classe = 'atencao'; titulo = 'Cuidado: tem um sinal de alerta.'; }
+  else { classe = 'certo'; titulo = 'Parece verdade, mas confira.'; }
+  let html = '<strong class="titulo">' + titulo + '</strong><p class="balao">' + destacar(texto) + '</p>';
+  if (sinais.length) {
+    html += 'O filtro achou ' + sinais.length + (sinais.length === 1 ? ' sinal:' : ' sinais:') + '<ul class="sinais">';
+    sinais.forEach(function (s) { html += '<li><b>' + escapar(s.nome) + '.</b> ' + escapar(s.dica) + '</li>'; });
+    html += '</ul>';
+  } else {
+    html += 'O filtro não achou nenhum sinal de golpe.';
+  }
+  html += '<p class="nota">O filtro só procura sinais conhecidos e pode errar. Na dúvida, não clique, não pague e confirme por outro caminho, como ligar para o número oficial.</p>';
+  alvo.className = 'resposta ' + classe;
+  alvo.innerHTML = html;
+  alvo.hidden = false;
+});
+document.getElementById('t-limpar').addEventListener('click', function () {
+  document.getElementById('t-texto').value = '';
+  document.getElementById('t-resposta').hidden = true;
+  document.getElementById('t-texto').focus();
+});
 </script>
 </body>
 </html>
