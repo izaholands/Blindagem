@@ -149,6 +149,10 @@ code{font-family:var(--mono);font-size:.85em}
 .resposta .balao{margin:.5rem 0 .7rem;background:#fff}
 .divisor{margin:1.6rem 0 .9rem}
 .divisor h2::before{background:var(--s)}
+.explica{margin-top:1.2rem;padding-top:1rem;border-top:1px solid var(--line)}
+.explica p{margin:.6rem 0}
+.explica ol{margin:.6rem 0;padding-left:1.3rem}
+.explica li{margin:.3rem 0}
 footer{margin-top:2rem;font-size:.85rem;color:var(--mute)}
 footer p{margin:.5rem 0;max-width:36rem}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
@@ -232,6 +236,7 @@ footer p{margin:.5rem 0;max-width:36rem}
           <button type="button" class="btn" id="c-cifrar">Cifrar</button>
           <button type="button" class="btn vazio" id="c-decifrar">Decifrar</button>
         </div>
+        <p class="nota">Cifrar embaralha o texto. Decifrar desfaz o embaralhado, então só faz sentido em um texto que já foi cifrado com a mesma chave.</p>
       </div>
       <div class="painel">
         <h3>Resultado</h3>
@@ -250,7 +255,18 @@ footer p{margin:.5rem 0;max-width:36rem}
       <p style="margin:0">Coloque um texto cifrado no campo de cima e clique abaixo. A tela tenta as 25 chaves possíveis, uma atrás da outra.</p>
       <div class="linha-botoes"><button type="button" class="btn vazio" id="c-quebrar">Tentar as 25 chaves</button></div>
       <ol class="todas" id="c-todas" hidden></ol>
-      <p class="nota">Por isso a cifra do bilhete é só um jogo: o computador testa tudo em um instante. Os aplicativos usam cifras muito mais fortes, como as do WhatsApp, mas a ideia é a mesma: embaralhar a mensagem com uma chave que só quem conversa tem. A tela tira os acentos para a conta ficar igual à do papel.</p>
+      <div class="explica">
+<h3>Como isso funciona</h3>
+<p>Na cifra do bilhete, a chave é o número de casas que cada letra anda no alfabeto. Como o alfabeto tem 26 letras, só existem 25 chaves possíveis: andar 26 casas devolve a letra para o lugar de origem.</p>
+<ol>
+<li>A tela pega o texto cifrado que está no campo de cima.</li>
+<li>Ela desfaz o embaralhado 25 vezes, uma para cada chave possível, e mostra cada resultado em uma linha.</li>
+<li>Só uma linha faz sentido em português. É a que usou a chave certa, e é nela que a mensagem aparece.</li>
+</ol>
+<p>Ou seja, mesmo sem saber a chave, qualquer pessoa descobre a mensagem em segundos. Esse jeito de testar todas as chaves até achar a certa se chama <b>força bruta</b>. O computador faz as 25 tentativas em menos de um milésimo de segundo.</p>
+<p>Por isso a cifra do bilhete é só um jogo. Aplicativos como o WhatsApp usam cifras modernas, com chaves tão grandes que existem mais possibilidades do que qualquer computador consegue testar. A ideia continua a mesma: embaralhar a mensagem com uma chave que só quem conversa tem.</p>
+<p class="nota">A tela ignora os acentos para a conta ficar igual à do papel.</p>
+</div>
     </div>
   </section>
 
@@ -278,7 +294,7 @@ footer p{margin:.5rem 0;max-width:36rem}
   <!-- ============ TELA 4: BLINDAGEM DO APARELHO ============ -->
   <section class="tela" id="tela-aparelho" role="tabpanel" aria-labelledby="aba-aparelho" hidden>
     <h2>Blindagem do aparelho</h2>
-    <p class="intro">Marque só o que você já conferiu no seu celular. O que estiver pendente fica em vermelho. O caminho nas configurações muda de um modelo para outro, então use a busca do próprio celular.</p>
+    <p class="intro">Marque só o que você já conferiu no seu celular. O que estiver sem marcação fica com a etiqueta "Pendente", e o que você marcar vira "Blindado". O caminho nas configurações muda de um modelo para outro, então use a busca do próprio celular.</p>
 
     <div class="painel">
       <p class="resumo" id="a-resumo"></p>
@@ -589,6 +605,30 @@ desenharAlfabeto();
 const COMUNS = ['senha', 'senha123', 'minhasenha', 'password', '123456', '12345678', '123456789', 'qwerty', 'brasil', 'amorzinho', 'iloveyou'];
 
 // cada regra recebe a frase e o nome, já em minúsculas, e responde sim ou não
+// sequência óbvia: números em ordem (3 ou mais), letras em ordem (4 ou mais), teclado (4 seguidas) ou o mesmo caractere 3 vezes
+const LINHAS_TECLADO = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
+function temSequencia(frase) {
+  const t = plano(frase);
+  if (/(.)\1\1/.test(t)) return true;
+  let subindo = 1, descendo = 1;
+  for (let i = 1; i < t.length; i++) {
+    const a = t[i - 1], b = t[i];
+    const mesmaClasse = (/[0-9]/.test(a) && /[0-9]/.test(b)) || (/[a-z]/.test(a) && /[a-z]/.test(b));
+    const d = b.charCodeAt(0) - a.charCodeAt(0);
+    subindo = (mesmaClasse && d === 1) ? subindo + 1 : 1;
+    descendo = (mesmaClasse && d === -1) ? descendo + 1 : 1;
+    const minimo = /[0-9]/.test(b) ? 3 : 4;
+    if (subindo >= minimo || descendo >= minimo) return true;
+  }
+  return LINHAS_TECLADO.some(function (linha) {
+    const volta = linha.split('').reverse().join('');
+    for (let i = 0; i + 4 <= linha.length; i++) {
+      if (t.includes(linha.slice(i, i + 4)) || t.includes(volta.slice(i, i + 4))) return true;
+    }
+    return false;
+  });
+}
+
 const REGRAS = [
   { texto: 'Tem 12 letras ou mais',
     traducao: 'Esta linha conta as letras. Passa se o total for 12 ou mais.',
@@ -603,9 +643,9 @@ const REGRAS = [
     traducao: 'Esta compara com o seu nome. Se o nome estiver lá dentro, a senha é reprovada.',
     precisaNome: true,
     passa: (frase, nome) => !frase.includes(nome) },
-  { texto: 'Não tem sequência óbvia (1234, abcd, qwer)',
-    traducao: 'Esta procura sequências que todo mundo tenta primeiro, ou o mesmo caractere três vezes seguidas.',
-    passa: (frase, nome) => !/(0123|1234|2345|3456|4567|5678|6789|abcd|bcde|qwer|asdf)|(.)\2\2/.test(frase) },
+  { texto: 'Não tem sequência óbvia (123, abcd, qwer)',
+    traducao: 'Esta procura números em ordem (123, 321), letras em ordem (abcd, dcba), pedaços da linha do teclado (qwer, asdf) ou o mesmo caractere três vezes seguidas.',
+    passa: (frase, nome) => !temSequencia(frase) },
   { texto: 'Não é uma senha famosa',
     traducao: 'Esta confere se a frase inteira está numa lista de senhas que todo mundo usa.',
     passa: (frase, nome) => !COMUNS.includes(frase.replace(/\s/g, '')) }
